@@ -8,6 +8,7 @@ suit=['Ace',"Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Jack
 deck=[]
 deck.extend(suit*4)
 shuffle(deck)
+
 def deal_with_aces(cards):
     temp=0
     for i in range(len(cards)):
@@ -48,7 +49,7 @@ def deal():
     values.append(calculate_score(dealer_cards))
     print(values)
     return values
-def hit():
+def hit(deck):
     values=[]
     player_cards.append(deck[0])
     deck.pop(0)
@@ -60,25 +61,35 @@ def hit():
     print(player_cards)
     print(dealer_cards)
     print(values)
-    check_game_state(values)
+    check_game_state(values,deck)
     
 def stand():
     print("standing")
-def hit_stand(player_cards,dealer_cards):
+def hit_stand(player_cards,dealer_cards,deck):
     i=''
     i=input("h or s")
     
     if i.lower()=="h":
-        hit()
+        hit(deck)
     elif i.lower()=="s":
         stand()
+        
+        
 values=deal()
 print(values[0])
-def check_game_state(values):
+
+
+
+def check_game_state(values,deck):
+    length_deck=len(deck)
+    if length_deck<5:
+        deck=[]
+        deck.extend(suit*4)
+        shuffle(deck)
+        
     if values[0]<21:
-        hit_stand(player_cards,dealer_cards)
+        hit_stand(player_cards,dealer_cards,deck)
     elif values[0]>21:
         stand()
         
-check_game_state(values)
-
+check_game_state(values,deck)
