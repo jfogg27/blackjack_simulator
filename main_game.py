@@ -8,7 +8,7 @@ win_loss_tracker=[]
 deck=[]
 dealer_cards=[]
 player_cards=[]
-deck.extend(suit*1)
+deck.extend(suit*4)
 shuffle(deck)
 loops=0
 
@@ -58,9 +58,21 @@ def hit(deck):
     values.append(calculate_score(dealer_cards))
     return values
     
-def stand():
-    print("standing")
-    return 'l'
+def stand(values):
+    while True:
+        if values[0]>21:
+            return 'l'
+        elif values[1]>values[0]:
+            return 'l'
+        elif values[1]<17:
+            values=[]
+            dealer_cards.append(deck[0])
+            deck.pop(0)
+            values.append(calculate_score(player_cards))
+            values.append(calculate_score(dealer_cards))
+        elif values[1]>=17 and values[0]>values[1]:
+            return 'w'
+            
     
 def hit_stand_func():
     return input("h or s: ")
@@ -73,7 +85,7 @@ def game_loop(deck):
     values=deal(deck)
     print("Dealer Cards: "+ dealer_cards[0]+', ? Value:'+str(CARDS[dealer_cards[0]]))
     print("Your Cards: "+player_cards[0]+","+player_cards[1]+" Value: "+ str(values[0]))
-    print(len(deck))
+    print('Left in deck:'+str(len(deck)))
     
     
     while hitting:
@@ -91,9 +103,9 @@ def game_loop(deck):
         elif hit_or_stand=='s':
             hitting=False
             
-    return stand()
+    return stand(values)
     
-while loops<5:
+while loops<50:
     dealer_cards=[]
     player_cards=[]
     win_loss=game_loop(deck)
