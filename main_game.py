@@ -11,6 +11,17 @@ player_cards=[]
 deck.extend(suit*4)
 shuffle(deck)
 loops=0
+strategy=[['','11','2','3','4','5','6','7','8','9','10'],['21','s','s','s','s','s','s','s','s','s','s'],['20','s','s','s','s','s','s','s','s','s','s'],
+['19','s','s','s','s','s','s','s','s','s','s'],['18','s','s','s','s','s','s','s','s','s','s'],['17','s','s','s','s','s','s','s','s','s','s'],
+['16','h','s','s','s','s','s','h','h','h','h'],['15','h','s','s','s','s','h','h','h','h','h'],['14','h','s','s','s','h','h','h','h','h','h'],['13','h','s','s','h','h','h','h','h','h','h'],['12','h','s','h','h','h','h','h','h','h','h']
+,['11','h','h','h','h','h','h','h','h','h','h']]
+
+
+
+
+
+
+
 
 def deal_with_aces(cards):
     temp=0
@@ -74,8 +85,19 @@ def stand(values):
             return 'w'
             
     
-def hit_stand_func():
-    return input("h or s: ")
+def hit_stand_func(values):
+        print(values[0])
+        for i in range(len(strategy)):
+            if strategy[i][0]==str(values[0]):
+                print('works')
+                row=i
+                if dealer_cards[0] != 'Ace':
+                   return strategy[row][CARDS[dealer_cards[0]]]
+                else:
+                   return strategy[row][1]
+            elif values[0]<=11:
+                return'h'
+                
 def game_loop(deck):
     if len(deck)<10:
         deck=[]
@@ -89,8 +111,8 @@ def game_loop(deck):
     
     
     while hitting:
-        hit_or_stand=hit_stand_func()
-        
+        hit_or_stand=hit_stand_func(values)
+        print(hit_or_stand)
         if hit_or_stand=='h':
             values=hit(deck)
             print("Dealer Cards: "+ dealer_cards[0]+', ? Value:'+str(CARDS[dealer_cards[0]]))
@@ -100,17 +122,15 @@ def game_loop(deck):
               print(player_cards[i-1])
             print('Value: '+str(values[0]))
             
-        elif hit_or_stand=='s':
+        elif hit_or_stand=='s' or values[0]>21:
             hitting=False
             
     return stand(values)
     
-while loops<50:
+while loops<10:
     dealer_cards=[]
     player_cards=[]
     win_loss=game_loop(deck)
     win_loss_tracker.extend(win_loss)
-    print(win_loss_tracker)   
+    print(win_loss_tracker)
     loops+=1
-
-
