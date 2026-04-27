@@ -31,12 +31,8 @@ print(soft_strategy)
 print('\n\n\n',hard_strategy)
 
 
-
-
-
-
-
 def deal_with_aces(cards):
+         
     temp=0
     for i in range(len(cards)):
         temp+=CARDS[cards[i]]
@@ -51,6 +47,15 @@ def calculate_score(cards):
         if cards[i]!="Ace":
                         value+=CARDS[cards[i]]
         else:
+            if cards.count('Ace')>=2:
+                 temp=0
+                 for i in range(len(cards)):
+                    if i != 'Ace':
+                        temp+=CARDS[cards[i]]
+                 if temp+11+(cards.count('Ace')-1)>21:
+                     value+=11
+                 else:
+                     value+=1
             value+=deal_with_aces(cards)
     return value
 
@@ -98,21 +103,31 @@ def stand(values,deck):
             return 'p'
    
 def hit_stand_func(values):
-    
-    if 'Ace' in player_cards and len(player_cards)==2:
-        print(player_cards)
+    if player_cards.count('Ace') == len(player_cards):
+        if dealer_cards[0] != 'Ace':
+                    return hard_strategy[9][CARDS[dealer_cards[0]]-1]
+        else:
+                return hard_strategy[9][10]
+      
+    if player_cards.count('Ace')==1 and len(player_cards)==2 :
+        print('ace in cards ')
         print(dealer_cards[0])
-        for i in range(len(hard_strategy)-20):
-            
-            if hard_strategy[i+20][0]==str(values[0]-11):
+        print(player_cards)
+        for i in range(len(soft_strategy)):
+            if soft_strategy[i][0]==str(values[0]-11):
                 row=i
-                return hard_strategy[row][CARDS[dealer_cards[0]]-1]
+                if dealer_cards[0] != 'Ace':
+                    return soft_strategy[row][CARDS[dealer_cards[0]]-1]
+                else:
+                    return soft_strategy[row][10]   
     else:
         for i in range(len(hard_strategy)):
             if hard_strategy[i][0]==str(values[0]):
                 row=i
                 if dealer_cards[0] != 'Ace':
                     return hard_strategy[row][CARDS[dealer_cards[0]]-1]
+                elif player_cards.count('Ace')==2:
+                    return 'h'
                 else:
                     return hard_strategy[row][1]   
 def game_loop(deck):
@@ -124,10 +139,11 @@ def game_loop(deck):
     hitting=True
     values=deal(deck)
     
-    while hitting:
-        
+    while hitting and values[0]<=21:
         hit_or_stand=hit_stand_func(values)
         print(hit_or_stand)
+        if hit_or_stand==None:
+            print(player_cards)
         if hit_or_stand=='h':
             values=hit(deck)
         elif hit_or_stand=='s' or values[0]>21:
@@ -149,7 +165,7 @@ def game_loop(deck):
                 return outcome
     return stand(values,deck)
    
-while loops<10:
+while loops<100000:
     dealer_cards=[]
     player_cards=[]
     win_loss=game_loop(deck)
