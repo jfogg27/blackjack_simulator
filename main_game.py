@@ -3,28 +3,30 @@ import csv
 import os
 import glob 
 
+#Define DECK Componets
 CARDS = {"Ace": 11, "Two": 2, "Three": 3, "Four": 4,
 "Five": 5, "Six": 6, "Seven": 7, "Eight": 8, "Nine": 9, "Ten": 10, "Jack": 10, "Queen": 10, "King": 10}
 suit=['Ace',"Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Jack","Queen","King"]
+deck=[]
+deck.extend(suit*4)
 
 win_loss=''
 win_loss_tracker=[]
 
-deck=[]
-deck.extend(suit*4)
 dealer_cards=[]
 player_cards=[]
-
 
 shuffle(deck)
 loops=0
 
+#Finds CSV in same folder of the .py program 
 program_dir = os.path.dirname(os.path.abspath(__file__))
 csv_file = glob.glob(os.path.join(program_dir, "*.csv"))
 
 hard_strategy=[]
 soft_strategy=[]
 
+#Decides If User wants to play or simluate blackjack.
 def sim_or_man():
     m_play=input('Do you want to simulate type s or manual type m?: ')
     if m_play=='m':
@@ -33,6 +35,8 @@ def sim_or_man():
     else: sim_or_man()
 m_play=sim_or_man()
 
+
+# Read and add soft and hard strategies to lists 
 if not m_play:
     try:
         with open(csv_file[0],'r') as file:
@@ -47,6 +51,8 @@ if not m_play:
         print("Cannot find Csv proper strategy make sure it is in same folder and is right layout!")
         os._exit(0)
 
+
+#Calculates if the ace should be 1 or 11 
 def deal_with_aces(cards):
          
     temp=0
@@ -57,6 +63,7 @@ def deal_with_aces(cards):
     else:
         return 11
 
+#calculates the total value of the cards that were gave
 def calculate_score(cards):
     value=0
     for i in range(len(cards)):
@@ -75,6 +82,7 @@ def calculate_score(cards):
             value+=deal_with_aces(cards)
     return value
 
+#Initial card dealing and setup
 def deal(deck):
     values=[]
     dealer_cards.append(deck[0])
@@ -90,7 +98,8 @@ def deal(deck):
     values.append(calculate_score(dealer_cards))
    
     return values
-   
+
+#Adds one card to the players hand
 def hit(deck):
     values=[]
     player_cards.append(deck[0])
@@ -98,8 +107,10 @@ def hit(deck):
     values.append(calculate_score(player_cards))
     values.append(calculate_score(dealer_cards))
     return values
-   
+
+# Decides if that game was a win or a loss
 def stand(values,deck):
+
     while values[1]<=21:
         if m_play:
             print('\n\n\n\n')
@@ -136,6 +147,8 @@ def stand(values,deck):
                 print(i)
             print('Your Value:',str(values[0]))
     return 'w'
+
+#Csv file decides if you should stay or hit or double
 def hit_stand_func(values):
     if not m_play:
         if player_cards.count('Ace') == len(player_cards):
@@ -165,16 +178,22 @@ def hit_stand_func(values):
                         return hard_strategy[row][1]   
     else:
         return input('Hit: h Stand:s Double:d Your Selection: ')
+
+#Mainn Game it loops through for each hand simulated 
 def game_loop(deck):
-    
+    #Shuffles in a new deck if cards are low 
     if len(deck)<10:
         deck=[]
         deck.extend(suit*4)
         shuffle(deck)
+
     hitting=True
     values=deal(deck)
     
+    # Loops the game for as long as you are hitting
     while hitting and values[0]<=21:
+
+        # Prints game info if playing manually
         if m_play:
             print("Dealer Cards:",'?',str(dealer_cards[0]))
             print('Dealer Value:',CARDS[dealer_cards[0]])
@@ -182,14 +201,18 @@ def game_loop(deck):
             for i in player_cards:
                 print(i)
             print('Your Value:',str(values[0]))
+
         hit_or_stand=hit_stand_func(values)
+
         if hit_or_stand!='d' and hit_or_stand!='s' and hit_or_stand!='h' :
             print('Make sure all input are in format of h,s,d')
+
         if hit_or_stand=='h':
             values=hit(deck)
-            
+
         elif hit_or_stand=='s' or values[0]>21:
             hitting=False
+
         elif hit_or_stand == 'd':
             values=[]
             player_cards.append(deck[0])
@@ -197,16 +220,20 @@ def game_loop(deck):
             values.append(calculate_score(player_cards))
             values.append(calculate_score(dealer_cards))
             outcome=stand(values,deck)
-            
+    
             if outcome =='w':
-                
                 return 'dw'
+            
             elif outcome=='l':
                 return 'dl'
+            
             else:
                 return outcome
+            
     return stand(values,deck)
    
+
+#Runs the simulation for 100,000 hands for a accurate model of the outcome
 while loops<100000:
     dealer_cards=[]
     player_cards=[]
@@ -216,7 +243,8 @@ while loops<100000:
         print('\n\n\n')
     win_loss_tracker.append(win_loss)
     loops+=1
-   
+
+#Displays Final Result of the simulation
 wins=win_loss_tracker.count('w')
 d_wins=win_loss_tracker.count('dw')
 losses=win_loss_tracker.count('l')
@@ -229,5 +257,7 @@ print('Doubled Wins:',str(d_wins))
 print('Losses:',str(losses+d_losses))
 print('Doubled Losses:',str(d_losses))
 print('Pushes:',str(pushes))
-print('Win Rate:',str(((wins+(0.5*pushes)+(2*d_wins))/(len(win_loss_tracker)+d_losses+d_wins))*100))
+
+print('Win Rate:',str(((wins+(2*d_wins))/(d_wins+d_losses+wins+losses))*100))
+
 
