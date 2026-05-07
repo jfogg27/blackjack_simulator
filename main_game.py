@@ -2,7 +2,6 @@ from random import shuffle
 import csv 
 import os
 import glob 
-import time 
 
 #Define DECK Componets
 CARDS = {"Ace": 11, "Two": 2, "Three": 3, "Four": 4,
@@ -36,7 +35,7 @@ def sim_or_man():
     else: sim_or_man()
 m_play=sim_or_man()
 if m_play==False:
-    sim_hands=input('How many hands should be simulated 100,000 , 200,000 .ect: ')
+    sim_hands=input('How many hands should be simulated (300,000 per second) .ect: ')
 else:
     sim_hands=input('How many hands do you want to play? ')
 # Read and add soft and hard strategies to lists 
@@ -49,6 +48,7 @@ if not m_play:
                     hard_strategy.append(row)
                 else:
                     soft_strategy.append(row)
+
 
     except:
         print("Cannot find Csv proper strategy make sure it is in same folder and is right layout!")
@@ -102,7 +102,7 @@ def hit(deck):
 # Decides if that game was a win or a loss
 def stand(values,deck):
 
-    while True:
+    while values[1]<=21:
         if m_play:
             print('\n\n\n\n')
             print("Dealer Cards:")
@@ -113,20 +113,31 @@ def stand(values,deck):
             for i in player_cards:
                 print(i)
             print('Your Value:',str(values[0]))
-
-        if values[0]>21: return 'b'
-
-        elif (values[1]>=17 and values[0]>values[1]) or values[1]<=21: return 'w'
-
-        elif values[1]>values[0]: return 'l'
-
+        if values[0]>21:
+            return 'l'
+        elif values[1]>values[0]:
+            return 'l'
         elif values[1]<17:
             dealer_cards.append(deck.pop(0))
             values[1]=calculate_score(dealer_cards)
+            
+        elif values[1]>=17 and values[0]>values[1]:
+            return 'w'
+        elif values[0]==values[1]:
+            return 'p'
+    if m_play:
+            print('\n\n\n\n')
+            print("Dealer Cards:")
+            for i in dealer_cards:
+                print(i)
+            print('Dealer Value:',str(values[1]))
+            print("Your Cards:")
+            for i in player_cards:
+                print(i)
+            print('Your Value:',str(values[0]))
+    return 'w'
 
-        elif values[0]==values[1]: return 'p'
-
-   
+    
 
 #Csv file decides if you should stay or hit or double
 def hit_stand_func(values):
@@ -175,8 +186,8 @@ def game_loop(deck):
     values=deal(deck)
     
     # Loops the game for as long as you are hitting
-    
     while hitting and values[0]<=21 and hit_or_stand != 's':
+
         # Prints game info if playing manually
         if m_play: 
             print("Dealer Cards:",'?',str(dealer_cards[0]))
@@ -204,7 +215,6 @@ def game_loop(deck):
    
 
 #Runs the simulation for # hands for a accurate model of the outcome
-start = time.perf_counter()
 while loops<int(sim_hands):
     dealer_cards = []
     player_cards = []
@@ -212,10 +222,8 @@ while loops<int(sim_hands):
     win_loss= game_loop(deck)
     win_loss_tracker.append(win_loss)
 
-    if loops % 500000 == 0:
+    if loops % 300000 == 0:
         print('hands simulated:',str(loops))
-        end = time.perf_counter()
-        print(f"{end-start:.6f}")
     if m_play:
         print(win_loss)
         print('\n\n\n')    
@@ -240,5 +248,3 @@ print('Doubled Losses:',str(d_losses))
 print('Pushes:',str(pushes))
 print('Win Rate:',str(((wins+(2*d_wins))/(d_wins+d_losses+wins+losses+d_losses))*100))
 input('Press Enter to exit Program: ')
-
-
