@@ -22,13 +22,14 @@ shuffle(deck)
 deck = deque(deck)
 loops=0
 
-#Finds CSV in same folder of the .py program  and adds the hard and soft strategy to lists and then converts those lists to dictionaries for faster access 
+#Finds CSV in same folder of the .py program
 program_dir = os.path.dirname(os.path.abspath(__file__))
 csv_file = glob.glob(os.path.join(program_dir, "*.csv"))
 
 hard_strategy=[]
 soft_strategy=[]
 
+#Tool to see runtime of code
 def runtime(func):
     def wrapper(*args,**kwargs):
         start_time=time.perf_counter()
@@ -47,10 +48,21 @@ def sim_or_man():
     else: sim_or_man()
 m_play=sim_or_man()
 
-if m_play==False: sim_hands=input('How many hands should be simulated 100,000 , 200,000 .ect: ')
-else: sim_hands=input('How many hands do you want to play? ')
+#Decides how many hands to sim or play
+def how_many():
+    try:
+        if m_play==False: 
+            sim_hands=input('How many hands should be simulated 100,000 , 200,000 .ect: ')
+            return int(sim_hands)
+        else: 
+            sim_hands=input('How many hands do you want to play? ')
+            return int(sim_hands)
+    except:
+        print("Please Enter A Number: ")
+        return how_many()
+sim_hands=how_many()
 
-# Read and add soft and hard strategies to lists  and then convert those lists to dictionaries for faster access
+# Read and add soft and hard strategies to lists and then convert those lists to dictionaries for faster access
 if not m_play:
     try:
         with open(csv_file[0],'r') as file:
@@ -67,11 +79,7 @@ if not m_play:
         print("Cannot find Csv proper strategy make sure it is in same folder and is right layout!")
         os._exit(0)
 
-
-
-
-
-#Calculates the total value of the cards that were gave 
+# If Manually playing prints the current state of the game
 def display_game_state(values):
     if m_play:
             print('\n\n\n\n')
@@ -83,6 +91,7 @@ def display_game_state(values):
                 print(i)
             print('Your Value:',str(values[0]))
 
+#Calculates the total value of cards inputed
 def calculate_score(cards):
     value = sum(CARDS[c] for c in cards)
     aces = cards.count('Ace')
@@ -92,18 +101,13 @@ def calculate_score(cards):
     return value
 
 #Initial card dealing and setup of the game it gives the player and dealer 2 cards and then calculates the score of those cards and returns them in a list
-
 def deal(deck):
     for _ in range(2):
         dealer_cards.append(deck.popleft())
         player_cards.append(deck.popleft())
     return [calculate_score(player_cards),calculate_score(dealer_cards)]
 
-#Adds one card to the players hand and recalculates the score after the player hits or doubles down 
-
-
 # Decides if that game was a win or a loss or a push and also handles the dealers hand if you stand
-
 def stand(values,deck):
     while values[1]<=21:
         display_game_state(values)
@@ -131,10 +135,7 @@ def stand(values,deck):
             print('Your Value:',str(values[0]))
     return 'w'
 
-   
-
 #Csv file decides if you should stay or hit or double
-
 def hit_stand_func(values):
     if not m_play:
         player_cards_len = len(player_cards)
@@ -155,7 +156,6 @@ def hit_stand_func(values):
         return input('Hit: h Stand:s Double:d Your Selection: ')
 
 #Main Game it loops through for each hand simulated or played and also shuffles in a new deck if the cards are low and also prints game info if playing manually 
-
 def game_loop(deck):
 
     #Shuffles in a new deck if cards are low  
@@ -169,10 +169,9 @@ def game_loop(deck):
     values=deal(deck)
     
     # Loops the game for as long as you are hitting 
-
     while hitting and values[0]<=21 and hit_or_stand != 's':
-        # Prints game info if playing manually
 
+        # Prints game info if playing manually
         display_game_state(values)
 
         hit_or_stand=hit_stand_func(values)   
@@ -194,7 +193,6 @@ def game_loop(deck):
    
 
 #Runs the simulation for # hands for a accurate model of the outcome 
-start = time.perf_counter()
 while loops<int(sim_hands):
     dealer_cards = []
     player_cards = []
@@ -202,15 +200,12 @@ while loops<int(sim_hands):
     win_loss= game_loop(deck)
     win_loss_tracker.append(win_loss)
 
-    if loops % 400000 == 0:
+    if loops % 100000 == 0:
         print('hands simulated:',str(loops))
-        end = time.perf_counter()
-        print(f"400,000 hands: {end-start:.6f}")
+        
     if m_play:
         print('\n\n\n')
         print(f"Last Game Outcome: {win_loss}")
-            
-
     loops += 1
 
 #Displays Final Result of the simulation
