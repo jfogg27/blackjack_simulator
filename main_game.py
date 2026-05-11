@@ -4,6 +4,7 @@ import os
 import glob 
 import time 
 from collections import deque
+
 #Define DECK Componets and other global variables 
 CARDS = {"Ace": 11, "Two": 2, "Three": 3, "Four": 4,
 "Five": 5, "Six": 6, "Seven": 7, "Eight": 8, "Nine": 9, "Ten": 10, "Jack": 10, "Queen": 10, "King": 10}
@@ -71,6 +72,17 @@ if not m_play:
 
 
 #Calculates the total value of the cards that were gave 
+def display_game_state(values):
+    if m_play:
+            print('\n\n\n\n')
+            print("Dealer Cards:")
+            print(dealer_cards[1])
+            print('Dealer Value:',str(values[1]))
+            print("Your Cards:")
+            for i in player_cards:
+                print(i)
+            print('Your Value:',str(values[0]))
+
 def calculate_score(cards):
     value = sum(CARDS[c] for c in cards)
     aces = cards.count('Ace')
@@ -89,14 +101,25 @@ def deal(deck):
 
 #Adds one card to the players hand and recalculates the score after the player hits or doubles down 
 
-def hit(deck):
-    player_cards.append(deck.popleft())
-    return calculate_score(player_cards)
 
 # Decides if that game was a win or a loss or a push and also handles the dealers hand if you stand
+
 def stand(values,deck):
-    while True:
-        if m_play:
+    while values[1]<=21:
+        display_game_state(values)
+        if values[0]>21:
+            return 'l'
+        elif values[1]>values[0]:
+            return 'l'
+        elif values[1]<17:
+            dealer_cards.append(deck.popleft())
+            values[1]=calculate_score(dealer_cards)
+           
+        elif values[1]>=17 and values[0]>values[1]:
+            return 'w'
+        elif values[0]==values[1]:
+            return 'p'
+    if m_play:
             print('\n\n\n\n')
             print("Dealer Cards:")
             for i in dealer_cards:
@@ -106,18 +129,7 @@ def stand(values,deck):
             for i in player_cards:
                 print(i)
             print('Your Value:',str(values[0]))
-
-        if values[0]>21: return 'b'
-
-        elif (values[1]>=17 and values[0]>values[1]) or values[1]<=21: return 'w'
-
-        elif values[1]>values[0]: return 'l'
-
-        elif values[1]<17:
-            dealer_cards.append(deck.popleft())
-            values[1]=calculate_score(dealer_cards)
-
-        elif values[0]==values[1]: return 'p'
+    return 'w'
 
    
 
@@ -143,9 +155,9 @@ def hit_stand_func(values):
         return input('Hit: h Stand:s Double:d Your Selection: ')
 
 #Main Game it loops through for each hand simulated or played and also shuffles in a new deck if the cards are low and also prints game info if playing manually 
+
 def game_loop(deck):
 
-    
     #Shuffles in a new deck if cards are low  
     if len(deck) < 20:
         new_cards = suit * 4
@@ -157,31 +169,27 @@ def game_loop(deck):
     values=deal(deck)
     
     # Loops the game for as long as you are hitting 
-    
+
     while hitting and values[0]<=21 and hit_or_stand != 's':
         # Prints game info if playing manually
-        if m_play: 
-            print("Dealer Cards:",'?',str(dealer_cards[0]))
-            print('Dealer Value:',CARDS[dealer_cards[0]])
-            print("Your Cards:")
-            for i in player_cards: print(i)
-            print('Your Value:',str(values[0]))
-        
+
+        display_game_state(values)
+
         hit_or_stand=hit_stand_func(values)   
 
-        #try:
-        if hit_or_stand=='h': 
-                values[0]=hit(deck)
-        elif hit_or_stand == 'd':
+        try:
+            if hit_or_stand=='h': 
                 player_cards.append(deck.popleft())
-
+                values[0]=calculate_score(player_cards)
+            elif hit_or_stand == 'd':
+                player_cards.append(deck.popleft())
                 values[0]=calculate_score(player_cards)
                 outcome=stand(values,deck)
                 if outcome=='p': return outcome
                 return str('d'+outcome )   
-        #except: 
-            #print('Make sure all input are in format of h,s,d')
-            #os._exit(0)
+        except: 
+            print('Make sure all input are in format of h,s,d')
+            os._exit(0)
     return stand(values,deck)
    
 
@@ -194,13 +202,15 @@ while loops<int(sim_hands):
     win_loss= game_loop(deck)
     win_loss_tracker.append(win_loss)
 
-    if loops % 1000000 == 0:
+    if loops % 400000 == 0:
         print('hands simulated:',str(loops))
         end = time.perf_counter()
-        print(f"1,000,000 hands: {end-start:.6f}")
+        print(f"400,000 hands: {end-start:.6f}")
     if m_play:
-        print(win_loss)
-        print('\n\n\n')    
+        print('\n\n\n')
+        print(f"Last Game Outcome: {win_loss}")
+            
+
     loops += 1
 
 #Displays Final Result of the simulation
@@ -222,6 +232,3 @@ print('Doubled Losses:',str(d_losses))
 print('Pushes:',str(pushes))
 print(f'Win Rate: {((wins+(2*d_wins))/(d_wins+d_losses+wins+losses+d_losses))*100:.2f}%')
 input('Press Enter to exit Program: ')
-
-
-
