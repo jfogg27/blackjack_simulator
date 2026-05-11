@@ -41,7 +41,7 @@ def runtime(func):
 
 #Decides If User wants to play or simluate blackjack and also how many hands they want to play or simulate.
 def sim_or_man():
-    m_play=input('Do you want to simulate type s or manual type m?: ')
+    m_play=input('Do you want to simulate hands of blackjack with the csv in this folder type s or do you want to manually play blackjack type m?: ')
     if m_play=='m':
         return True
     elif m_play=='s': return False
@@ -79,7 +79,7 @@ if not m_play:
         print("Cannot find Csv proper strategy make sure it is in same folder and is right layout!")
         os._exit(0)
 
-# If Manually playing prints the current state of the game
+# If manually playing prints the current state of the game
 def display_game_state(values):
     if m_play:
             print('\n\n\n\n')
@@ -91,7 +91,7 @@ def display_game_state(values):
                 print(i)
             print('Your Value:',str(values[0]))
 
-#Calculates the total value of cards inputed
+# Calculates the total value of cards inputed
 def calculate_score(cards):
     value = sum(CARDS[c] for c in cards)
     aces = cards.count('Ace')
@@ -100,7 +100,7 @@ def calculate_score(cards):
         aces -= 1
     return value
 
-#Initial card dealing and setup of the game it gives the player and dealer 2 cards and then calculates the score of those cards and returns them in a list
+#Initial card dealing and setup of the game it gives the player and dealer two cards and then calculates the score of those cards and returns them in a list
 def deal(deck):
     for _ in range(2):
         dealer_cards.append(deck.popleft())
@@ -112,7 +112,7 @@ def stand(values,deck):
     while values[1]<=21:
         display_game_state(values)
         if values[0]>21:
-            return 'l'
+            return 'b'
         elif values[1]>values[0]:
             return 'l'
         elif values[1]<17:
@@ -200,8 +200,8 @@ while loops<int(sim_hands):
     win_loss= game_loop(deck)
     win_loss_tracker.append(win_loss)
 
-    if loops % 100000 == 0:
-        print('hands simulated:',str(loops))
+    if loops % 1000000 == 0:
+        print('Hands simulated:',str(loops))
         
     if m_play:
         print('\n\n\n')
