@@ -85,7 +85,7 @@ def display_game_state(values):
             print('\n\n\n\n')
             print("Dealer Cards:")
             print(dealer_cards[1])
-            print('Dealer Value:',str(values[1]))
+            print('Dealer Value:',str(CARDS[dealer_cards[1]))
             print("Your Cards:")
             for i in player_cards:
                 print(i)
