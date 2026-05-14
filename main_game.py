@@ -85,7 +85,7 @@ def display_game_state(values):
             print('\n\n\n\n')
             print("Dealer Cards:")
             print(dealer_cards[1])
-            print('Dealer Value:',str(CARDS[dealer_cards[1]))
+            print('Dealer Value:',str(CARDS[dealer_cards[1]]))
             print("Your Cards:")
             for i in player_cards:
                 print(i)
@@ -110,7 +110,6 @@ def deal(deck):
 # Decides if that game was a win or a loss or a push and also handles the dealers hand if you stand
 def stand(values,deck):
     while values[1]<=21:
-        display_game_state(values)
         if values[0]>21:
             return 'b'
         elif values[1]>values[0]:
@@ -199,22 +198,22 @@ while loops<int(sim_hands):
     
     win_loss= game_loop(deck)
     win_loss_tracker.append(win_loss)
-
-    if loops % 1000000 == 0:
-        print('Hands simulated:',str(loops))
-        
+    
     if m_play:
         print('\n\n\n')
         print(f"Last Game Outcome: {win_loss}")
+    elif loops % 1000000 == 0:
+        print('Hands simulated:',str(loops))
     loops += 1
 
 #Displays Final Result of the simulation
 wins=win_loss_tracker.count('w')
 d_wins=win_loss_tracker.count('dw')
 
-losses=win_loss_tracker.count('l')+win_loss_tracker.count('b')
-busts=win_loss_tracker.count('b')
-d_losses=win_loss_tracker.count('dl')
+
+busts=win_loss_tracker.count('b')+win_loss_tracker.count('db')
+losses=win_loss_tracker.count('l')+busts
+d_losses=win_loss_tracker.count('dl')+win_loss_tracker.count('db')
 
 pushes=win_loss_tracker.count('p')
 
