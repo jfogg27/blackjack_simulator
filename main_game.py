@@ -225,5 +225,6 @@ print('You busted:',str(busts))
 print(f'You busted: {(busts/len(win_loss_tracker))*100:.2f}% of games')
 print('Doubled Losses:',str(d_losses))
 print('Pushes:',str(pushes))
-print(f'Win Rate: {((wins+(2*d_wins))/(d_wins+d_losses+wins+losses+d_losses))*100:.2f}%')
+win_rate = ((wins + (2 * d_wins)) / len(win_loss_tracker)) * 100
+print(f'Win Rate: {win_rate:.2f}%')
 input('Press Enter to exit Program: ')
